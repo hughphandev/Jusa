@@ -1,0 +1,6 @@
+#load "Basic"
+
+main ( argc : int, argv : char* ) : int
+{
+	int a = 0;
+}

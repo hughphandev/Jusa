@@ -16,7 +16,7 @@ set OBJDIR=%BUILDDIR%obj\
 REM Clean up	
    del %BUILDDIR%*.pdb
 
-REM Platform code
+REM Compiler code
 	cl %CFLAGS% /Fo:%OBJDIR% /Fd:%OBJDIR% %SOURCEDIR%main.cpp /link %LDFLAGS% %LDLIBS% /OUT:%BUILDDIR%jus.exe
 
 REM Test code

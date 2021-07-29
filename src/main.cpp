@@ -23,12 +23,14 @@ enum token_type
 
     TOKEN_COLON = ':',
     TOKEN_SEMI = ';',
+    TOKEN_COMA = ',',
 
     TOKEN_ASTERISK = '*',
     TOKEN_HASH = '#',
 
     TOKEN_IDENTIFIER = 256,
     TOKEN_NUMBER,
+    TOKEN_KEYWORD,
     TOKEN_STRING,
 };
 
@@ -37,7 +39,15 @@ struct token
     size_t textLength;
     char* text;
     token_type type;
+};
 
+struct node
+{
+    //TODO: AST parsing
+    token value;
+
+    node* left;
+    node* right;
 };
 
 bool IsLiteral(char c)
@@ -68,7 +78,8 @@ bool IsNumber(char c)
 
 char* LoadFile(char* fileName)
 {
-    FILE* file = fopen(fileName, "r");
+    //NOTE: Read in text mode convert \r\n to \n cause the fread to read less than the file size!
+    FILE* file = fopen(fileName, "rb");
     char* result = 0;
     if (file)
     {
@@ -76,7 +87,7 @@ char* LoadFile(char* fileName)
         size_t size = ftell(file);
         rewind(file);
         result = (char*)malloc(size + 1);
-        fread(result, 1, size, file);
+        size = fread(result, sizeof(char), size, file);
         result[size] = '\0';
 
         fclose(file);
@@ -131,7 +142,7 @@ token GetToken(tokenizer* tknizer)
         char* base = tknizer->at;
         result.type = TOKEN_IDENTIFIER;
         result.text = tknizer->at;
-        while (!IsWhiteSpace(tknizer->at[0]))
+        while (IsAlpha(tknizer->at[0]) || IsNumber(tknizer->at[0]) || tknizer->at[0] == '_')
         {
             ++tknizer->at;
         }
@@ -167,6 +178,19 @@ token GetToken(tokenizer* tknizer)
     return result;
 }
 
+bool TokenEqual(token tk, char* match)
+{
+    for (int i = 0; i < tk.textLength; ++i)
+    {
+        if (tk.text[i] != match[i])
+        {
+            return false;
+        }
+    }
+
+    return (match[tk.textLength] == '\0');
+}
+
 int main(int argc, char* argv[])
 {
     if (argc > 1)
@@ -176,28 +200,24 @@ int main(int argc, char* argv[])
         tokenizer tknizer = {};
         tknizer.at = src;
 
-        bool parsing = true;
-        while (parsing)
+        //TODO: Dynamic allocate token!
+#define MAX_TOKEN_COUNT 1000
+        token tokens[MAX_TOKEN_COUNT] = {};
+
+        int tokenCount = 0;
+        int index = 0;
+        while (tokenCount < MAX_TOKEN_COUNT)
         {
             token tk = GetToken(&tknizer);
-            switch (tk.type)
-            {
-                default:
-                {
-                    printf("%i: %.*s\n", tk.type, tk.textLength, tk.text);
-                } break;
+            if(tk.type == TOKEN_EOS) break;
+            tokens[index++] = tk;
+            ++tokenCount;
+        }
 
-                case TOKEN_EOS:
-                {
-                    parsing = false;
-                } break;
-            }
+        for (int i = 0; i < tokenCount; ++i)
+        {
+            printf("%i: %.*s\n", tokens[i].type, (int)tokens[i].textLength, tokens[i].text);
         }
     }
-    else
-    {
-        puts("not enough parameters");
-    }
-
     return 0;
 }
