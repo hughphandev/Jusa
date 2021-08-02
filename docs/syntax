@@ -1,0 +1,18 @@
+// Grammar (Open for suggestion)
+
+<Variable Definition> -> <ID> : <ID> | <ID> := <term>
+<Function Definition> -> <ID> '(' <ID> : <ID> ',' ... ')' : ID '{' <stmts> '}'
+
+<assign> -> <ID> '=' <ID> | <ID> '=' <expr>
+
+<operator> -> '+' | '-' | '*' | '/' | '&' | '|'
+
+<expr> -> <term> [<operator> <term>]
+
+<term> -> <ID> | <literal>
+
+<Function Call> -> ID '(' <expr> ',' ... ')'
+
+<stmts> -> <stmt> <stmts>
+
+<stmt> -> <assign> | <Variable Definition>

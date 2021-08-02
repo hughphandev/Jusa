@@ -2,5 +2,8 @@
 
 main ( argc : int, argv : char* ) : int
 {
-	int a = 0;
+	a : int; // declare a integer
+	b := 100; // auto declare a integer
+
+	return 0;
 }
